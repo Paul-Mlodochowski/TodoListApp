@@ -16,7 +16,9 @@
 
     <ListView
             ItemsSource="{Binding List}"
-            
+            IsPullToRefreshEnabled="True"
+            IsRefreshing="{Binding IsBusy}"
+            RefreshCommand="{Binding RefreshCommand}"
             CachingStrategy="RecycleElement"
             HasUnevenRows="True">
         
@@ -100,6 +102,7 @@
                                     IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
 
                     </StackLayout>
+                         
                         <SearchBar Placeholder="Filer with tags"
                                    x:Name="SearchBar"
                                    HorizontalOptions="Center"
@@ -107,16 +110,24 @@
                                    IsVisible="{Binding IsToggledFilter, Mode=OneWay}"
                                    SearchCommand="{Binding TagsFilterCommand}"
                                    SearchCommandParameter="{Binding Text, Source={x:Reference SearchBar}}"/>
-                
-                    </StackLayout>
+                        <SearchBar Placeholder="Find By Title or description"
+                                   x:Name="SearchBarTitle"
+                                   HorizontalOptions="CenterAndExpand"
+                                   SearchCommand="{Binding TitleOrDescriptonFilterCommand}"
+                                   SearchCommandParameter="{Binding Text, Source={x:Reference SearchBarTitle}}"/>
+
+                </StackLayout>
                 </Frame>
         </ListView.Header>
         <ListView.Footer>
-                     <Button
-                     Text="Add new Todo"
-                     HorizontalOptions="EndAndExpand"
-                     Margin="0,20,5,5"
-                     Command="{Binding AddNewTODOCommand}"/>
+            <StackLayout>
+                
+                <Button
+                         Text="Add new Todo"
+                         HorizontalOptions="EndAndExpand"
+                         Margin="0,20,5,5"
+                         Command="{Binding AddNewTODOCommand}"/>
+            </StackLayout>
         </ListView.Footer>
 
     </ListView>

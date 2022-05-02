@@ -65,7 +65,7 @@ namespace TodoListApp.Services
 
             };
 
-            var rows = db.UpdateAsync(ItemToPut);
+            await db.UpdateAsync(ItemToPut);
             
         }
         

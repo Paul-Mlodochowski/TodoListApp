@@ -21,14 +21,14 @@ namespace TodoListApp.Models
         }
        public List<string> ReturnCombidedListOfTagsWithPrexiex(string value) {
             var ReturnList = new List<string>(value.Split(','));
-            ReturnList.ForEach(item => { Tags.Add(item.Trim().Insert(0, "#")); });
+            ReturnList.ForEach(item => { Tags.Add(item.Trim().Insert(0, "#").ToLower()); });
             return new List<string>(this.Tags);
             
 
         }
         public List<string> ReturnCombidedListOfTags(string value) {
             var ReturnList = new List<string>(value.Split(' '));
-            ReturnList.ForEach(item => { Tags.Add(item.Trim()); });
+            ReturnList.ForEach(item => { Tags.Add(item.Trim().ToLower()); });
             return new List<string>(this.Tags);
 
 
