@@ -19,6 +19,10 @@ namespace TodoListApp.Models
             Tags.ForEach(item => { sb.Append(item + " "); });
             return sb.ToString();
         }
+        /// <summary>
+        /// Zwraca Listę tagów z hasztagiem
+        /// </summary>
+        
        public List<string> ReturnCombidedListOfTagsWithPrexiex(string value) {
             var ReturnList = new List<string>(value.Split(','));
             ReturnList.ForEach(item => { Tags.Add(item.Trim().Insert(0, "#").ToLower()); });
@@ -26,6 +30,9 @@ namespace TodoListApp.Models
             
 
         }
+        /// <summary>
+        /// Zwraca Listę tagów BEZ hasztaków
+        /// </summary>
         public List<string> ReturnCombidedListOfTags(string value) {
             var ReturnList = new List<string>(value.Split(' '));
             ReturnList.ForEach(item => { Tags.Add(item.Trim().ToLower()); });

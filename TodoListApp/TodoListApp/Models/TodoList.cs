@@ -32,6 +32,7 @@ namespace TodoListApp.Models
         }
         public TodoList() { }
 
+        // Do zmieniania statusu po wciśnięciu swicha
         public bool ChangeStatus { get => Status;  set {
                 if (Status != value) {
                     this.Status = value;

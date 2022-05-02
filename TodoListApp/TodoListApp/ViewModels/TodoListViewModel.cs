@@ -13,10 +13,17 @@ using System.Text.RegularExpressions;
 namespace TodoListApp.ViewModels
 {
     public class TodoListViewModel : BaseViewModel {
+        /// <summary>
+        /// Główna lista Todo która jest wyświetlania w UI
+        /// </summary>
         public ObservableRangeCollection<TodoList> List { get; set; }
 
         private bool _istoggledFilter = false;
         private bool _istoggled = false;
+        
+
+        //Właściwości
+
         public bool IsToggledFilter { get => _istoggledFilter; set {
                 SetProperty(ref _istoggledFilter, value);
             } }
@@ -60,6 +67,8 @@ namespace TodoListApp.ViewModels
                 SetProperty(ref _date, value);
 
             } }
+
+        //Komendy
         public AsyncCommand AddNewTODOCommand { get; }
         public AsyncCommand<TodoList> DeleteCommand { get; }
         
@@ -83,9 +92,9 @@ namespace TodoListApp.ViewModels
 
         }
 
-        
 
-        async void Add() {
+
+        private async void Add() {
             
             List = new ObservableRangeCollection<TodoList>();
 
@@ -94,8 +103,9 @@ namespace TodoListApp.ViewModels
 
             OnPropertyChanged("List");
         }
-        
-        async Task AddNewTODO() {
+
+        //Dodaje nowy kafelek Todo
+        private async Task AddNewTODO() {
             var tytul = await App.Current.MainPage.DisplayPromptAsync("Title", "Name the Title: ");
             var opis = await App.Current.MainPage.DisplayPromptAsync("Description", "Name the description: ");
             var tags = await App.Current.MainPage.DisplayPromptAsync("Tags", "Tags Represented are as (Tag, Tag2...) ", placeholder:"Seperate tags with (,)");
@@ -107,16 +117,35 @@ namespace TodoListApp.ViewModels
             List.Clear();
             List.AddRange(await TodoAppDb.GetList());
         }
-        async Task DeleteTODO(TodoList todo) {
+        private async Task DeleteTODO(TodoList todo) {
             await TodoAppDb.Delete(todo.ID);
             List.Clear();
             List.AddRange(await TodoAppDb.GetList());
         }
-       async void FilterTheResult(Func<Task<ObservableRangeCollection<TodoList>>> func) {
-            List = await func.Invoke();
+
+        
+        //Funkcja która wyświetla kafelki po filtrowaniu  (Każa filtrująca metoda z tej 'delegaty' korzysta)
+        private async void FilterTheResult(Func<Task<ObservableRangeCollection<TodoList>>> func) {
+            if (_istoggledFilter) {  // Jeżeli filtrowanie jest właczone to filtruj wyniki wraz z wyszukiwaniem
+                var todoFilter = new ObservableRangeCollection<TodoList>();
+                var fliteredTodoList = new ObservableRangeCollection<TodoList>();
+
+
+                todoFilter = await func.Invoke();
+                foreach (var t in todoFilter) {
+                    if (List.Any(lisTodo => lisTodo.ID == t.ID))
+                        fliteredTodoList.Add(t);
+                }
+                List.Clear();
+                List.AddRange(fliteredTodoList);
+                
+            }
+            else 
+                List = await func.Invoke();
             OnPropertyChanged("List");
         }
-        public void  TagsFilter(string text) {
+        //Funkcja filtrująca tagi
+        private void  TagsFilter(string text) {
             if (string.IsNullOrEmpty(text))
                 return;
 
@@ -141,7 +170,9 @@ namespace TodoListApp.ViewModels
                 return filteredResult;
             });
         }
-        public void TitleOrDescriptionFilter(string text) {
+
+        //Funkja wyszukująca tytułu albo opisu
+        private void TitleOrDescriptionFilter(string text) {
             if(string.IsNullOrEmpty(text))
                 return;
             text = text.Trim();
@@ -157,6 +188,7 @@ namespace TodoListApp.ViewModels
             });
             
         }
+        //Funkcja która resetuje UI
         private async Task Refresh() {
             IsBusy = true;
             var list = await TodoAppDb.GetList();
