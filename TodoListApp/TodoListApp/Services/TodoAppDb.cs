@@ -52,7 +52,21 @@ namespace TodoListApp.Services
         }
         public static async Task UpdateStatus(bool val,int ID) {
             await Init();
-            await db.ExecuteAsync("UPDATE TodoList SET Status = ? Where ID = ?", val, ID);
+            var todo = await db.Table<TodoList>().ToListAsync();
+            var guy = todo.Find(t => t.ID == ID);
+            var ItemToPut = new TodoList()
+            {
+                ID = ID,
+                Tytul = guy.Tytul,
+                Opis = guy.Opis,
+                Data = guy.Data,
+                Status = val,
+                Tagi = guy.Tagi
+
+            };
+
+            var rows = db.UpdateAsync(ItemToPut);
+            
         }
         
        

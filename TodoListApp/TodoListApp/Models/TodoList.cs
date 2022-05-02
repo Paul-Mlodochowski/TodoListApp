@@ -32,9 +32,11 @@ namespace TodoListApp.Models
         }
         public TodoList() { }
 
-        public  bool ChangeStatus { get => Status; set { 
-             Status = value;
-                _ = TodoAppDb.UpdateStatus(value, this.ID);
+        public bool ChangeStatus { get => Status;  set {
+                if (Status != value) {
+                    this.Status = value;
+                    _ = TodoAppDb.UpdateStatus(this.Status, this.ID);
+                }
             } }
 
     }

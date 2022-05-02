@@ -4,11 +4,14 @@
              xmlns:viewmodels="clr-namespace:TodoListApp.ViewModels" 
              xmlns:model="clr-namespace:TodoListApp.Models"
              x:Class="TodoListApp.Views.TodoListPage"
-             x:Name="TodoPage">
+             x:Name="TodoPage"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             >
+    
     <ContentPage.BindingContext>
         <viewmodels:TodoListViewModel/>
     </ContentPage.BindingContext>
-
+    
 
 
     <ListView
@@ -20,6 +23,7 @@
 
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="model:TodoList">
+                
                 <ViewCell>
                     <ViewCell.ContextActions>
                         <MenuItem Text="Delete"
@@ -57,8 +61,10 @@
                                            VerticalTextAlignment="Center"
                                            Margin="80,0,0,0"
                                           />
+                                    
                                     <Switch 
                                         IsToggled="{Binding ChangeStatus}"
+                                       
                                         Toggled="Switch_Toggled"/>
                                 </StackLayout>
                             </StackLayout>
@@ -69,6 +75,11 @@
                 </ViewCell>
             </DataTemplate>
         </ListView.ItemTemplate>
+
+        
+        
+        
+        
         <ListView.Header>
                 <Frame BorderColor="Azure">
                      <StackLayout Orientation="Vertical">
@@ -78,7 +89,9 @@
                     </StackLayout>
                     <StackLayout Orientation="Horizontal" Margin="0,20,0,20">
                             <DatePicker   HorizontalOptions="StartAndExpand"
-                                          IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
+                                          IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"
+                                         
+                                          Date="{Binding DateSelected, Mode=TwoWay}"/>
                             <Label Text="IsDone: " 
                                    VerticalTextAlignment="Center" 
                                    HorizontalTextAlignment="End"    
@@ -88,8 +101,12 @@
 
                     </StackLayout>
                         <SearchBar Placeholder="Filer with tags"
+                                   x:Name="SearchBar"
                                    HorizontalOptions="Center"
-                                   IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
+                                   IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"
+                                   IsVisible="{Binding IsToggledFilter, Mode=OneWay}"
+                                   SearchCommand="{Binding TagsFilterCommand}"
+                                   SearchCommandParameter="{Binding Text, Source={x:Reference SearchBar}}"/>
                 
                     </StackLayout>
                 </Frame>

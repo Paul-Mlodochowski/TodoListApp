@@ -6,6 +6,8 @@ using MvvmHelpers;
 using MvvmHelpers.Commands;
 using TodoListApp.Models;
 using TodoListApp.Services;
+using System.Linq;
+using Xamarin.Forms;
 
 namespace TodoListApp.ViewModels
 {
@@ -24,32 +26,65 @@ namespace TodoListApp.ViewModels
 
                 if(value)
                 FilterTheResult(async () => {
-                    var FiltredResults = new ObservableRangeCollection<TodoList>();
+
+                    var query = from item in await TodoAppDb.GetList()
+                                where item.Status
+                                select item;
+                    var NewResults = new ObservableRangeCollection<TodoList>();
+                     NewResults.AddRange(query);
+                    return NewResults;
+                    /*var FiltredResults = new ObservableRangeCollection<TodoList>();
                     foreach (var item in await TodoAppDb.GetList())
                         if(item.Status)
                             FiltredResults.Add(item);
-                    return FiltredResults;
+                    return FiltredResults;*/
                  });
                 else
                     FilterTheResult(async () => {
-                        var FiltredResults = new ObservableRangeCollection<TodoList>();
-                        foreach (var item in await TodoAppDb.GetList())
-                            if (!item.Status)
-                                FiltredResults.Add(item);
-                        return FiltredResults;
+                        var query = from item in await TodoAppDb.GetList()
+                                    where !item.Status
+                                    select item;
+                        var FilteredResults = new ObservableRangeCollection<TodoList>();
+                        FilteredResults.AddRange(query);
+                        return FilteredResults;
                     });
                 SetProperty(ref _istoggled, value);
             } }
-        public Command<TodoList> IsToggledCommand{ get; }
-        public TodoListViewModel() {
+        //public  Command<TodoList> IsToggledCommand{ get; }
+       // public  Command DateSelectedCommad{ get; }
+        private DateTime _date = DateTime.Today;
+        public DateTime DateSelected { get => _date; set { // Filtroawnie dat
+                FilterTheResult(async () => {
 
+                    var query = from item in await TodoAppDb.GetList()
+                                where DateTime.Compare(item.Data, value) >= 0
+                                select item;
+                    var FilteredResults = new ObservableRangeCollection<TodoList>();
+                    FilteredResults.AddRange(query);
+                    return FilteredResults;
+                    
+                });
+                SetProperty(ref _date, value);
+
+            } }
+        public MvvmHelpers.Commands.Command<string> TagsFilterCommand { get; }
+        public bool ToggleSwitchProperty { get => _istoggled; set
+            {
+                _= App.Current.MainPage;
+            }
+        }
+        public TodoListViewModel() {
+            
             Add();
+
             AddNewTODOCommand = new AsyncCommand(AddNewTODO);
             DeleteCommand = new AsyncCommand<TodoList>(DeleteTODO);
+            TagsFilterCommand = new MvvmHelpers.Commands.Command<string>(TagsFilter);
             
+
         }
         async void Add() {
-           
+            
             List = new ObservableRangeCollection<TodoList>();
 
             List.AddRange(await TodoAppDb.GetList());
@@ -61,7 +96,7 @@ namespace TodoListApp.ViewModels
         async Task AddNewTODO() {
             var tytul = await App.Current.MainPage.DisplayPromptAsync("Title", "Name the Title: ");
             var opis = await App.Current.MainPage.DisplayPromptAsync("Description", "Name the description: ");
-            var tags = await App.Current.MainPage.DisplayPromptAsync("Tags", "Tags Represented are as (Tag, Tag2...) ");
+            var tags = await App.Current.MainPage.DisplayPromptAsync("Tags", "Tags Represented are as (Tag, Tag2...) ", placeholder:"Seperate tags with (,)");
             TagFormater tagfor = new TagFormater();
             tagfor.FormatTags(tags);
 
@@ -79,6 +114,30 @@ namespace TodoListApp.ViewModels
             List = await func.Invoke();
             OnPropertyChanged("List");
         }
+        public void  TagsFilter(string text) {
+            
+           TagFormater tagFormater = new TagFormater();
+            var listOfUserTags =  tagFormater.ReturnCombidedListOfTagsWithPrexiex(text);
+            tagFormater.Clear();
+            FilterTheResult(async () =>
+            {
+
+                var filteredResult = new ObservableRangeCollection<TodoList>();
+                
+                foreach (var item in await TodoAppDb.GetList()) {
+                    var tagsString = item.Tagi;
+                    var tagsList = tagFormater.ReturnCombidedListOfTags(tagsString);
+                    tagFormater.Clear();
+                    foreach (var tag in listOfUserTags)
+                        if (tagsList.Contains(tag)) {
+                            filteredResult.Add(item);
+                            break;
+                        }
+                }
+                return filteredResult;
+            });
+        }
         
+
     }
 }

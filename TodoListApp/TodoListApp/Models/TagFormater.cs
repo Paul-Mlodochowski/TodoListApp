@@ -6,7 +6,7 @@ namespace TodoListApp.Models
 {
     public class TagFormater
     {
-        public List<string> Tags { get; set; } = new List<string>();
+        private List<string> Tags { get; set; } = new List<string>();
 
         public void FormatTags(string tag) {
             var tagarray = tag.Split(',');
@@ -18,6 +18,23 @@ namespace TodoListApp.Models
             StringBuilder sb = new StringBuilder();
             Tags.ForEach(item => { sb.Append(item + " "); });
             return sb.ToString();
+        }
+       public List<string> ReturnCombidedListOfTagsWithPrexiex(string value) {
+            var ReturnList = new List<string>(value.Split(','));
+            ReturnList.ForEach(item => { Tags.Add(item.Trim().Insert(0, "#")); });
+            return new List<string>(this.Tags);
+            
+
+        }
+        public List<string> ReturnCombidedListOfTags(string value) {
+            var ReturnList = new List<string>(value.Split(' '));
+            ReturnList.ForEach(item => { Tags.Add(item.Trim()); });
+            return new List<string>(this.Tags);
+
+
+        }
+        public void Clear() {
+            Tags.Clear();
         }
 
     }
