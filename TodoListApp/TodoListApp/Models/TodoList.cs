@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SQLite;
+using TodoListApp.Services;
 
 namespace TodoListApp.Models
 {
@@ -30,5 +31,11 @@ namespace TodoListApp.Models
             this.Opis = opis;
         }
         public TodoList() { }
+
+        public  bool ChangeStatus { get => Status; set { 
+             Status = value;
+                _ = TodoAppDb.UpdateStatus(value, this.ID);
+            } }
+
     }
 }

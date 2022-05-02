@@ -50,6 +50,11 @@ namespace TodoListApp.Services
             await db.DeleteAsync<TodoList>(id);
            
         }
+        public static async Task UpdateStatus(bool val,int ID) {
+            await Init();
+            await db.ExecuteAsync("UPDATE TodoList SET Status = ? Where ID = ?", val, ID);
+        }
+        
        
     }
 }

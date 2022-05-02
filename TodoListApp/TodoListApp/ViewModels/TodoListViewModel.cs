@@ -15,10 +15,32 @@ namespace TodoListApp.ViewModels
        
         public AsyncCommand AddNewTODOCommand { get; }
         public AsyncCommand<TodoList> DeleteCommand { get; }
+        private bool _istoggledFilter = false;
         private bool _istoggled = false;
-        public bool IsToggledFilter { get => _istoggled; set { 
-            SetProperty(ref _istoggled, value);
+        public bool IsToggledFilter { get => _istoggledFilter; set { 
+            SetProperty(ref _istoggledFilter, value);
             } }
+        public bool IsToggled { get => _istoggled; set { //Dla Filtrowania zadan ukończonych
+
+                if(value)
+                FilterTheResult(async () => {
+                    var FiltredResults = new ObservableRangeCollection<TodoList>();
+                    foreach (var item in await TodoAppDb.GetList())
+                        if(item.Status)
+                            FiltredResults.Add(item);
+                    return FiltredResults;
+                 });
+                else
+                    FilterTheResult(async () => {
+                        var FiltredResults = new ObservableRangeCollection<TodoList>();
+                        foreach (var item in await TodoAppDb.GetList())
+                            if (!item.Status)
+                                FiltredResults.Add(item);
+                        return FiltredResults;
+                    });
+                SetProperty(ref _istoggled, value);
+            } }
+        public Command<TodoList> IsToggledCommand{ get; }
         public TodoListViewModel() {
 
             Add();
@@ -53,8 +75,10 @@ namespace TodoListApp.ViewModels
             List.Clear();
             List.AddRange(await TodoAppDb.GetList());
         }
-        void ToggleFilters(bool value) {
-            App.Current.MainPage.DisplayAlert("RA",value.ToString(),"fff");
+       async void FilterTheResult(Func<Task<ObservableRangeCollection<TodoList>>> func) {
+            List = await func.Invoke();
+            OnPropertyChanged("List");
         }
+        
     }
 }

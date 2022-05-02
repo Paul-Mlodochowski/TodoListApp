@@ -22,5 +22,7 @@ namespace TodoListApp.Views
             var frame = (sender as Switch).Parent.Parent.Parent as Frame;
             _ = (bool)e.Value ? frame.BackgroundColor = Color.FromHex("#77D191") : frame.BackgroundColor = Color.Default;
         }
+
+        
     }
 }
