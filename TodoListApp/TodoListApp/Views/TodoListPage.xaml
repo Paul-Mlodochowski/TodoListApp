@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:viewmodels="clr-namespace:TodoListApp.ViewModels" 
+             xmlns:model="clr-namespace:TodoListApp.Models"
+             x:Class="TodoListApp.Views.TodoListPage"
+             x:Name="TodoPage">
+    <ContentPage.BindingContext>
+        <viewmodels:TodoListViewModel/>
+    </ContentPage.BindingContext>
+
+
+
+    <ListView
+            ItemsSource="{Binding List}"
+            
+            CachingStrategy="RecycleElement"
+            HasUnevenRows="True">
+        
+
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="model:TodoList">
+                <ViewCell>
+                    <ViewCell.ContextActions>
+                        <MenuItem Text="Delete"
+                                  Command="{Binding
+                            Source={x:Reference TodoPage},
+                            Path=BindingContext.DeleteCommand}"
+                                  CommandParameter="{Binding .}"/>
+                    </ViewCell.ContextActions>
+                    <Grid Padding="15">
+                        <Frame CornerRadius="10">
+                            <StackLayout Orientation="Vertical" >
+                               
+                                <StackLayout Orientation="Horizontal">
+                                    <StackLayout  Orientation="Horizontal">
+                                        <Label Text="{Binding Tytul}" 
+                                               WidthRequest="150"
+                                               HeightRequest="30"
+                                               FontSize="Subtitle"/>
+                                        <Label Text="{Binding Tagi}"
+                                               WidthRequest="100"
+                                               FontSize="Small"
+                                               HorizontalOptions="CenterAndExpand"/>
+                                    </StackLayout>
+                                    <Label Text="{Binding Data}" 
+                                           HorizontalTextAlignment="Center"
+                                           FontSize="Small"/>
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal"
+                                             >
+                                    <Label Text="{Binding Opis}"
+                                           WidthRequest="150"
+                                           HeightRequest="120"
+                                          />
+                                    <Label Text="Done: "
+                                           VerticalTextAlignment="Center"
+                                           Margin="80,0,0,0"
+                                          />
+                                    <Switch 
+                                        Toggled="Switch_Toggled"/>
+                                </StackLayout>
+                            </StackLayout>
+
+                        </Frame>
+
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.Header>
+                <Frame BorderColor="Azure">
+                     <StackLayout Orientation="Vertical">
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Label Text="Filter" HorizontalTextAlignment="Center" />
+                        <CheckBox IsChecked="{Binding IsToggledFilter, Mode=TwoWay}"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="0,20,0,20">
+                            <DatePicker   HorizontalOptions="StartAndExpand"
+                                          IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
+                            <Label Text="IsDone: " 
+                                   VerticalTextAlignment="Center" 
+                                   HorizontalTextAlignment="End"    
+                                   FontSize="Small"/>
+                            <Switch IsToggled="false" HorizontalOptions="EndAndExpand"
+                                    IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
+
+                    </StackLayout>
+                        <SearchBar Placeholder="Filer with tags"
+                                   HorizontalOptions="Center"
+                                   IsEnabled="{Binding IsToggledFilter, Mode=OneWay}"/>
+                
+                    </StackLayout>
+                </Frame>
+        </ListView.Header>
+        <ListView.Footer>
+                     <Button
+                     Text="Add new Todo"
+                     HorizontalOptions="EndAndExpand"
+                     Margin="0,20,5,5"
+                     Command="{Binding AddNewTODOCommand}"/>
+        </ListView.Footer>
+
+    </ListView>
+</ContentPage>
