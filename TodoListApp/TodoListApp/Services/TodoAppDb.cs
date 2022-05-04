@@ -68,7 +68,14 @@ namespace TodoListApp.Services
             await db.UpdateAsync(ItemToPut);
             
         }
-        
-       
+        public static async Task Update(TodoList todo) {
+            await Init();
+            
+
+            await db.UpdateAsync(todo);
+
+        }
+
+
     }
 }

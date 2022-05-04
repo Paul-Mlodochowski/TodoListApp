@@ -71,6 +71,7 @@ namespace TodoListApp.ViewModels
         //Komendy
         public AsyncCommand AddNewTODOCommand { get; }
         public AsyncCommand<TodoList> DeleteCommand { get; }
+        public AsyncCommand<TodoList> UpdateCommand { get; }
         
         public MvvmHelpers.Commands.Command<string> TagsFilterCommand { get; }
         public MvvmHelpers.Commands.Command<string> TitleOrDescriptonFilterCommand { get; }
@@ -85,6 +86,7 @@ namespace TodoListApp.ViewModels
 
             AddNewTODOCommand = new AsyncCommand(AddNewTODO);
             DeleteCommand = new AsyncCommand<TodoList>(DeleteTODO);
+            UpdateCommand = new AsyncCommand<TodoList>(UpdateTODO);
             TagsFilterCommand = new MvvmHelpers.Commands.Command<string>(TagsFilter);
             TitleOrDescriptonFilterCommand = new MvvmHelpers.Commands.Command<string>(TitleOrDescriptionFilter);
             RefreshCommand = new AsyncCommand(Refresh);
@@ -109,6 +111,8 @@ namespace TodoListApp.ViewModels
             var tytul = await App.Current.MainPage.DisplayPromptAsync("Title", "Name the Title: ");
             var opis = await App.Current.MainPage.DisplayPromptAsync("Description", "Name the description: ");
             var tags = await App.Current.MainPage.DisplayPromptAsync("Tags", "Tags Represented are as (Tag, Tag2...) ", placeholder:"Seperate tags with (,)");
+            if (tytul is null || opis is null || tags is null)
+                return;
             TagFormater tagfor = new TagFormater();
             tagfor.FormatTags(tags);
 
@@ -122,26 +126,35 @@ namespace TodoListApp.ViewModels
             List.Clear();
             List.AddRange(await TodoAppDb.GetList());
         }
+        private async Task UpdateTODO(TodoList todo) {
+            TagFormater tagfor = new TagFormater();
+            List<string> tmpListOfTags = tagfor.ReturnCombidedListOfTags(todo.Tagi);
+            string oldTagsString = tagfor.ReturnCombinedString(tmpListOfTags);
+            var tytul = await App.Current.MainPage.DisplayPromptAsync("Title", "Name the Title: ",initialValue:todo.Tytul);
+            var opis = await App.Current.MainPage.DisplayPromptAsync("Description", "Name the description: ", initialValue: todo.Opis);
+            var tags = await App.Current.MainPage.DisplayPromptAsync("Tags", "Tags Represented are as (Tag, Tag2...) ", placeholder: "Seperate tags with (,)", initialValue: oldTagsString);
+            if (tytul is null || opis is null || tags is null)
+                return;
+            tagfor.Clear();
+            tagfor.FormatTags(tags);
+            TodoList newTodo = new TodoList()
+            {
+                ID = todo.ID,
+                Status = todo.Status,
+                Tytul = tytul,
+                Data = todo.Data,
+                Opis = opis,
+                Tagi = tagfor.ReturnCombinedString()
+            };
+            await TodoAppDb.Update(newTodo);
+            List.Clear();
+            List.AddRange(await TodoAppDb.GetList());
+        }
 
-        
+
         //Funkcja która wyświetla kafelki po filtrowaniu  (Każa filtrująca metoda z tej 'delegaty' korzysta)
         private async void FilterTheResult(Func<Task<ObservableRangeCollection<TodoList>>> func) {
-            if (_istoggledFilter) {  // Jeżeli filtrowanie jest właczone to filtruj wyniki wraz z wyszukiwaniem
-                var todoFilter = new ObservableRangeCollection<TodoList>();
-                var fliteredTodoList = new ObservableRangeCollection<TodoList>();
-
-
-                todoFilter = await func.Invoke();
-                foreach (var t in todoFilter) {
-                    if (List.Any(lisTodo => lisTodo.ID == t.ID))
-                        fliteredTodoList.Add(t);
-                }
-                List.Clear();
-                List.AddRange(fliteredTodoList);
-                
-            }
-            else 
-                List = await func.Invoke();
+            List = await func.Invoke();
             OnPropertyChanged("List");
         }
         //Funkcja filtrująca tagi

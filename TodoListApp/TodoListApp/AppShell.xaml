@@ -10,6 +10,7 @@
     
         https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/
     -->
+    
 
     <Shell.Resources>
         <ResourceDictionary>

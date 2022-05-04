@@ -5,7 +5,6 @@
              xmlns:model="clr-namespace:TodoListApp.Models"
              x:Class="TodoListApp.Views.TodoListPage"
              x:Name="TodoPage"
-             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
              >
     
     <ContentPage.BindingContext>
@@ -20,19 +19,26 @@
             IsRefreshing="{Binding IsBusy}"
             RefreshCommand="{Binding RefreshCommand}"
             CachingStrategy="RecycleElement"
-            HasUnevenRows="True">
+            HasUnevenRows="True"
+            SelectionMode="None">
         
 
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="model:TodoList">
-                
+
                 <ViewCell>
                     <ViewCell.ContextActions>
+                        <MenuItem Text="Update"
+                                  Command="{Binding
+                            Source={x:Reference TodoPage},
+                            Path=BindingContext.UpdateCommand}"
+                                  CommandParameter="{Binding .}"/>
                         <MenuItem Text="Delete"
                                   Command="{Binding
                             Source={x:Reference TodoPage},
                             Path=BindingContext.DeleteCommand}"
                                   CommandParameter="{Binding .}"/>
+                        
                     </ViewCell.ContextActions>
                     <Grid Padding="15">
                         <Frame CornerRadius="10">

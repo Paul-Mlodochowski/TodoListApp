@@ -25,11 +25,7 @@ namespace TodoListApp.Models
            
         }
 
-        public TodoList(string tytul, string opis) {
-            this.Tytul = tytul;
-            this.Data = DateTime.Now;
-            this.Opis = opis;
-        }
+        
         public TodoList() { }
 
         // Do zmieniania statusu po wciśnięciu swicha
